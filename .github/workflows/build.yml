@@ -28,14 +28,14 @@ jobs:
         run: |
           pxt target arcade
           pxt install
-          pxt build --no-cache
+          pxt build
 
       - name: Upload to Latest Release
         uses: softprops/action-gh-release@v1
         with:
           tag_name: latest
           name: "Última Compilación Automática"
-          body: "Compilación generada el ${{ github.event.head_commit.timestamp }}. Descarga el .uf2 para tu consola."
+          body: "Compilación generada el ${{ github.event.head_commit.timestamp }}. Busca el archivo .uf2 en los Assets."
           draft: false
           prerelease: true
           files: |
