@@ -24,29 +24,32 @@ jobs:
       - name: Install PXT
         run: npm install -g pxt
 
-      - name: Initialize, Install and Build
+      - name: Force Hardware & Build
         run: |
           pxt target arcade
+          # Este script de python añade el hardware al pxt.json manualmente
+          python3 -c '
+          import json
+          with open("pxt.json", "r") as f:
+              data = json.load(f)
+          if "dependencies" not in data: data["dependencies"] = {}
+          data["dependencies"]["hw---rpi"] = "*"
+          with open("pxt.json", "w") as f:
+              json.dump(data, f, indent=4)
+          '
           pxt install
-          # Instalamos una variante de hardware para forzar la creación del .uf2
-          # 'rpi' es la más común para arcade, si usas otra (como meowbit) puedes cambiarla
-          pxt add hw---rpi || true
-          pxt build
+          pxt build --no-cache
 
       - name: Locate and Upload Binary
         run: |
-          # Buscamos el archivo en cualquier parte de la carpeta 'built'
-          FILE=$(find built -name "*.uf2" | head -n 1)
-          if [ -z "$FILE" ]; then
-            echo "No se encontró .uf2 en 'built', buscando en todo el proyecto..."
-            FILE=$(find . -name "*.uf2" | head -n 1)
-          fi
-
+          # Buscamos de forma agresiva
+          FILE=$(find . -name "*.uf2" | head -n 1)
+          
           if [ -n "$FILE" ]; then
-            echo "Subiendo: $FILE"
+            echo "¡ENCONTRADO!: $FILE"
             gh release upload latest "$FILE" --clobber
           else
-            echo "ERROR: No se generó ningún archivo .uf2"
+            echo "ERROR: Solo se generó JS. Contenido de built:"
             ls -R built
             exit 1
           fi
