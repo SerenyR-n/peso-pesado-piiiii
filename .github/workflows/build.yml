@@ -28,22 +28,20 @@ jobs:
         run: |
           pxt target arcade
           pxt install
-          # Forzamos el hardware editando el archivo pxt.json directamente
-          sed -i 's/"preferredHardware": ".*"/"preferredHardware": "rpi"/' pxt.json || true
           pxt build
 
-      - name: Upload to Latest Release
-        uses: softprops/action-gh-release@v1
-        with:
-          tag_name: latest
-          name: "Última Compilación Automática"
-          body: "Juego compilado. Busca el archivo .uf2 abajo en Assets."
-          draft: false
-          prerelease: true
-          files: |
-            built/**/*.uf2
-            built/**/*.elf
-            built/*.uf2
-            built/*.elf
+      - name: Locate and Upload Binary
+        run: |
+          # Búsqueda exhaustiva del archivo compilado y subida a Github Release
+          file=$(find . -name "*.uf2" | head -n 1)
+          if [ -n "$file" ]; then
+            echo "Archivo encontrado: $file"
+            # Instalar la herramienta hub o usar la API para adjuntar
+            gh release upload latest "$file" --clobber || true
+          else
+            echo "No se encontró el archivo .uf2, buscando en el directorio..."
+            ls -la
+            exit 1
+          fi
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
