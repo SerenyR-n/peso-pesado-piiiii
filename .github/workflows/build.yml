@@ -24,9 +24,10 @@ jobs:
       - name: Install PXT
         run: npm install -g pxt
 
-      - name: Initialize and Build
+      - name: Initialize, Install and Build
         run: |
           pxt target arcade
+          pxt install  # <--- ESTO ARREGLA EL ERROR DEL 'DEVICE'
           pxt build
 
       - name: Create Release
