@@ -10,7 +10,6 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    # Añadimos permisos explícitos aquí por si acaso
     permissions:
       contents: write
     steps:
@@ -29,18 +28,18 @@ jobs:
         run: |
           pxt target arcade
           pxt install
-          pxt build --hw rpi # Forzamos la compilación de hardware para asegurar el .uf2
+          pxt build --allhw # Esto genera el .uf2 para todos los hardwares compatibles
 
       - name: Upload to Latest Release
         uses: softprops/action-gh-release@v1
         with:
           tag_name: latest
           name: "Última Compilación Automática"
-          body: "Archivo actualizado el ${{ github.event.head_commit.timestamp }}"
+          body: "Compilación generada automáticamente. Descarga el archivo .uf2 para tu consola."
           draft: false
           prerelease: true
           files: |
-            **/*.uf2
-            **/*.elf
+            built/**/*.uf2
+            built/**/*.elf
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
