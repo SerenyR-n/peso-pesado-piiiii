@@ -28,18 +28,18 @@ jobs:
         run: |
           pxt target arcade
           pxt install
-          pxt build --allhw # Esto genera el .uf2 para todos los hardwares compatibles
+          pxt build --no-cache
 
       - name: Upload to Latest Release
         uses: softprops/action-gh-release@v1
         with:
           tag_name: latest
           name: "Última Compilación Automática"
-          body: "Compilación generada automáticamente. Descarga el archivo .uf2 para tu consola."
+          body: "Compilación generada el ${{ github.event.head_commit.timestamp }}. Descarga el .uf2 para tu consola."
           draft: false
           prerelease: true
           files: |
-            built/**/*.uf2
-            built/**/*.elf
+            **/*.uf2
+            **/*.elf
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
