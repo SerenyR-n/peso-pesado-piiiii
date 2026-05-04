@@ -1,0 +1,38 @@
+name: MakeCode Build & Release
+
+on:
+  push:
+    branches:
+      - main  # O 'master', asegúrate de poner el nombre de tu rama principal
+    tags:
+      - 'v*'   # Se activará también si creas una etiqueta (ej. v1.0)
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Install PXT
+        run: |
+          npm install -g pxt
+          npm install
+
+      - name: Build Project
+        run: pxt build --all
+
+      - name: Create Release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            built/binary.uf2
+            built/binary.elf
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
