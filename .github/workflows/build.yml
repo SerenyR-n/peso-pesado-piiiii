@@ -28,8 +28,8 @@ jobs:
         run: |
           pxt target arcade
           pxt install
-          # En lugar de banderas en el build, usamos 'pxt set' para elegir hardware
-          pxt set hw rpi
+          # Forzamos el hardware editando el archivo pxt.json directamente
+          sed -i 's/"preferredHardware": ".*"/"preferredHardware": "rpi"/' pxt.json || true
           pxt build
 
       - name: Upload to Latest Release
@@ -37,7 +37,7 @@ jobs:
         with:
           tag_name: latest
           name: "Última Compilación Automática"
-          body: "Compilación generada automáticamente. Busca los archivos .uf2 o .elf abajo."
+          body: "Juego compilado. Busca el archivo .uf2 abajo en Assets."
           draft: false
           prerelease: true
           files: |
