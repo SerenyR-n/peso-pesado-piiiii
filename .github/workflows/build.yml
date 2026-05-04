@@ -27,30 +27,34 @@ jobs:
       - name: Force Hardware & Build
         run: |
           pxt target arcade
-          # Este script de python añade el hardware al pxt.json manualmente
+          # Editamos el pxt.json para incluir explícitamente el hardware de consola
           python3 -c '
-          import json
-          with open("pxt.json", "r") as f:
-              data = json.load(f)
-          if "dependencies" not in data: data["dependencies"] = {}
-          data["dependencies"]["hw---rpi"] = "*"
-          with open("pxt.json", "w") as f:
-              json.dump(data, f, indent=4)
+          import json, os
+          if os.path.exists("pxt.json"):
+              with open("pxt.json", "r") as f:
+                  data = json.load(f)
+              if "dependencies" not in data: data["dependencies"] = {}
+              # Añadimos soporte para Raspberry Pi Arcade que genera .uf2
+              data["dependencies"]["hw---rpi"] = "*"
+              with open("pxt.json", "w") as f:
+                  json.dump(data, f, indent=4)
           '
           pxt install
-          pxt build --no-cache
+          # Solo "pxt build", nada más. Cero banderas.
+          pxt build
 
       - name: Locate and Upload Binary
         run: |
-          # Buscamos de forma agresiva
-          FILE=$(find . -name "*.uf2" | head -n 1)
+          # Buscamos cualquier archivo .uf2 que se haya generado
+          FILE=$(find . -name "*.uf2" -not -path "*/node_modules/*" | head -n 1)
           
           if [ -n "$FILE" ]; then
-            echo "¡ENCONTRADO!: $FILE"
+            echo "¡ÉXITO! Encontrado: $FILE"
             gh release upload latest "$FILE" --clobber
           else
-            echo "ERROR: Solo se generó JS. Contenido de built:"
-            ls -R built
+            echo "ERROR: Solo se generó el simulador JS."
+            echo "Contenido de la carpeta built:"
+            ls -R built || echo "Carpeta built no existe"
             exit 1
           fi
         env:
