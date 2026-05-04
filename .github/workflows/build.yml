@@ -5,9 +5,9 @@ on:
     branches:
       - main
       - master
-    tags:        # <--- Las etiquetas ahora están dentro de push
+    tags:
       - 'v*'
-  workflow_dispatch: # <--- Esto activa el botón manual
+  workflow_dispatch: 
 
 jobs:
   build:
@@ -22,12 +22,12 @@ jobs:
           node-version: 18
 
       - name: Install PXT
-        run: |
-          npm install -g pxt
-          npm install
+        run: npm install -g pxt
 
-      - name: Build Project
-        run: pxt build --all
+      - name: Initialize and Build
+        run: |
+          pxt target arcade
+          pxt build --all --no-cache
 
       - name: Create Release
         if: startsWith(github.ref, 'refs/tags/')
