@@ -3,9 +3,11 @@ name: MakeCode Build & Release
 on:
   push:
     branches:
-      - main  # O 'master', asegúrate de poner el nombre de tu rama principal
-    tags:
-      - 'v*'   # Se activará también si creas una etiqueta (ej. v1.0)
+      - main
+      - master
+    tags:        # <--- Las etiquetas ahora están dentro de push
+      - 'v*'
+  workflow_dispatch: # <--- Esto activa el botón manual
 
 jobs:
   build:
