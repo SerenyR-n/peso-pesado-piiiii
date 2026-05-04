@@ -19,7 +19,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20 # Actualizado a la versión 20 para evitar avisos
+          node-version: 20
 
       - name: Install PXT
         run: npm install -g pxt
@@ -27,7 +27,7 @@ jobs:
       - name: Initialize and Build
         run: |
           pxt target arcade
-          pxt build --no-cache # Quitamos el --all que causaba el error
+          pxt build
 
       - name: Create Release
         if: startsWith(github.ref, 'refs/tags/')
