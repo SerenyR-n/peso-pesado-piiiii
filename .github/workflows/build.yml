@@ -28,18 +28,21 @@ jobs:
         run: |
           pxt target arcade
           pxt install
-          pxt build
+          # Forzamos la compilación para hardware común para asegurar la creación del .uf2
+          pxt build --common
 
       - name: Upload to Latest Release
         uses: softprops/action-gh-release@v1
         with:
           tag_name: latest
           name: "Última Compilación Automática"
-          body: "Compilación generada el ${{ github.event.head_commit.timestamp }}. Busca el archivo .uf2 en los Assets."
+          body: "Compilación generada el ${{ github.event.head_commit.timestamp }}. Si no ves el .uf2, revisa los logs de compilación."
           draft: false
           prerelease: true
+          # Usamos búsqueda recursiva total para encontrar el binario
           files: |
-            **/*.uf2
-            **/*.elf
+            **/built/**/*.uf2
+            **/built/**/*.elf
+            built/binary.uf2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
